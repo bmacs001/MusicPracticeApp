@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Set Default Goals for Each Instrument</h1>
+    <p>In format HH:MM</p>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {% for instrument in instruments %}
+        if instrument.defaultGoalInMinutes is not None:
+            getattr(form, instrument.label + "TimeHour", IntegerField()).data =
+            getattr(form, instrument.label + "TimeMin", IntegerField()).data = int(instrument.defaultGoalInMinutes % 60)
+            <p>
+                {{ instrument.label }}<br>
+                {{ form|attr(instrument.label+"TimeHour")(min="0", max="23", size=32, value=instrument.defaultGoalInMinutes//60) }}:
+                {{ form|attr(instrument.label+"TimeMin")(min="0", max="59", size=32, value=instrument.defaultGoalInMinutes%60) }}
+            </p>
+        {% endfor %}
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4" id="headJumbo">Welcome
+    {% if not current_user.is_anonymous %}, {{ current_user.username }}
+    {% endif %}!</h1>
+</div>
+{% endblock %}

@@ -19,7 +19,6 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    instruments = TextAreaField('Instruments (Separate with line breaks)')
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -33,8 +32,14 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 
+class InstrumentForm(FlaskForm):
+    instruments = TextAreaField('Input Instruments To Practice (Separate with line breaks)')
+    submit = SubmitField('Submit')
+
+
 class RegimentForm(FlaskForm):
     warmups = TextAreaField('Warmup')
     repertoire = TextAreaField('Repertoire')
     goalMin = IntegerField('Custom Goal')
     goalHour = IntegerField('Custom Goal')
+    submit = SubmitField('Submit')

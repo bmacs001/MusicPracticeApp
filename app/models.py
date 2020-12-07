@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from app import db
+from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -36,6 +36,11 @@ class Regiment(db.Model):
     goalInMinutes = db.Column(db.Integer)
     timeElapsedInSeconds = db.Column(db.Integer)
     instrumentId = db.Column(db.Integer, db.ForeignKey('instrument.id'))
+
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 # User<Instrument<Regiment, where carats are one-to-many relationships
