@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import \
-    StringField, SubmitField, PasswordField, BooleanField, SelectField, TextAreaField
-from wtforms.fields.html5 import DateField
+    StringField, SubmitField, PasswordField, BooleanField, TextAreaField
+from wtforms.fields.html5 import IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
 
@@ -34,8 +34,7 @@ class RegistrationForm(FlaskForm):
 
 
 class RegimentForm(FlaskForm):
-    date = DateField('Date')
-    instrument = SelectField('Instrument', coerce=int)
     warmups = TextAreaField('Warmup')
     repertoire = TextAreaField('Repertoire')
-    goal = StringField('Custom Goal (hh:mm)')
+    goalMin = IntegerField('Custom Goal')
+    goalHour = IntegerField('Custom Goal')
