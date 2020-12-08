@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ day }}</h1>
+    <p>Select an instrument to practice</p>
+    <div class="container">
+    <div class="row row-cols-3">
+        {% for instrument in instruments %}
+            <div class="col">
+                <h4><a href="/practice/{{ instrument.label }}">{{ instrument.label }}</a></h4>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+{% endblock %}

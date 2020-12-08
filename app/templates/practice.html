@@ -1,10 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+<script>
+$(document).ready(function(){
+	var timer = {
+	    hours : {{ hour }},
+		minutes : {{ min }},
+		seconds :  0,
+		isOn : false,
+		blink: false
+	};
 
-</body>
-</html>
+	var t; // timespan val from javascript
+	var startStopButton = $("#start-stop");
+	startStopButton.click(
+		function() {
+			startCount();
+		}
+	);
+	$("#reset").click(onReset);
+
+	function printTimer() {
+		var min = timer.minutes < 10 ? "0" : "";
+		var sec = + timer.seconds < 10 ? "0" : "";
+		var hour = timer.hours > 0 ? timer.hours + ":" : "";
+		if (timer.hitMax() && timer.blink) {
+				$("#timer-text").text("You've met your goal!");
+		}
+		else {
+			$("#timer-text").text(hour+min
+				+ timer.minutes
+				+ ":"
+				+ sec
+				+ timer.seconds);
+		}
+		timer.blink = !timer.blink;
+	}
+
+	function startCount() {
+		if (!timer.isOn) {
+			timer.isOn = true;
+			t = setInterval(
+			function () {
+				if (timer.seconds == 0) {
+					timer.minutes --;
+					if (timer.minutes == 0) {
+					    timer.hours --;
+                    }
+					timer.seconds = 60;
+				}
+				timer.seconds --;
+				printTimer();
+            }, 1000);
+
+			startStopButton.text("Pause");
+			startStopButton.click(stopCount);
+			startStopButton.removeClass("btn-success");
+			startStopButton.addClass("btn-danger");
+		}
+	}
+
+	function stopCount() {
+		clearInterval(t);
+		timer.isOn = false;
+		startStopButton.text("Start");
+		startStopButton.click(startCount);
+		startStopButton.removeClass("btn-danger");
+		startStopButton.addClass("btn-success");
+	}
+	window.onbeforeunload = function(){
+	    $.post('/practicedToday', {
+	        hour: hours,
+            minute: minutes,
+            second: seconds,
+            regimentId: {{ regiment.id }}
+	    });
+    }
+});
+</script>
+    <h1 id="timer-text" class="timer">{{ hour }}:{{ minute }}:00</h1>
+    <p class="lead">
+        <div class="row">
+            <button id="start-stop" class="btn btn-lg btn-success">Start</button>
+            <button id="reset" class="btn btn-lg">Reset</button>
+        </div>
+    </p>
+{% endblock %}

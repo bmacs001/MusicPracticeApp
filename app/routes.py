@@ -4,7 +4,7 @@ from app import app, db
 from app.models import User, Instrument, Regiment
 from app.forms import LoginForm, RegimentForm, RegistrationForm, InstrumentForm
 from datetime import date
-from flask import render_template, redirect, flash, request, url_for
+from flask import render_template, redirect, flash, request, url_for, jsonify
 from flask_wtf import FlaskForm
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
@@ -110,7 +110,8 @@ def defaultGoals():
 @login_required
 def practiceHome():
     today = date.today()
-    return render_template('practiceHome.html', title='Practice', instruments=current_user.instruments, today=today)
+    return render_template('practiceHome.html', title='Practice', instruments=current_user.instruments,
+                           day=today.strftime('%A, %B %d, %Y'))
 
 
 @app.route('/practice/<instrument>', methods=['GET', 'POST'])
@@ -129,7 +130,15 @@ def practice(instrument):
         db.session.add(regimentIn)
         db.session.commit()
     return render_template('practice.html', title='Practice', instruments=current_user.instruments, today=today,
-                           instrumentIn=instrumentIn, regimentIn=regimentIn)
+                           instrumentIn=instrumentIn, regimentIn=regimentIn, hour=regimentIn.goalInMinutes//60,
+                           min=regimentIn.goalInMinutes%60)
+
+
+@app.route('/practicedToday', methods=['POST'])
+@login_required
+def recordPractice():
+    Regiment.query().filter_by(id=request.form['regimentId']).first().timeElapsedInSeconds = \
+        request.form['second'] + request.form['minute']*60 + request.form['hour']*3600
 
 
 @app.route('/account')
