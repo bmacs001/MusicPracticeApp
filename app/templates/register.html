@@ -3,13 +3,16 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
+     <div class="row justify-content-center">
+         <p>
+             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
             {% for error in form.username.errors %}
                 <span style="color: #ff0000;">[{{ error }}]</span>
             {% endfor %}
         </p>
+     </div>
+        <div class="row justify-content-center">
         <p>
             {{ form.email.label }}<br>
             {{ form.email(size=64) }}<br>
@@ -17,6 +20,8 @@
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        </div>
+        <div class="row justify-content-center">
         <p>
             {{ form.password.label }}<br>
             {{ form.password(size=32) }}<br>
@@ -31,6 +36,9 @@
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        </div>
+        <div class="row justify-content-center">
         <p>{{ form.submit() }}</p>
+        </div>
     </form>
 {% endblock %}
