@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ instrument.label }}: {{ dateFormatted }}</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.warmups.label }}<br>
+            {{ form.warmups(size=32, value=regiment.warmups) }}
+        </p>
+        <p>
+            {{ form.repertoire.label }}<br>
+            {{ form.repertoire(size=32, value=regiment.repertoire) }}
+        </p>
+        <p>
+            {{ form.goalHour.label }}<br>
+            {{ form.goalHour(min="0", max="23", value=hour) }}:
+            {{ form.goalMin(min="0", max="59", value=min) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ dateFormatted }}</h1>
 
-</body>
-</html>
+    <div class="container">
+    {% for instrument in current_user.instruments %}
+        {% set reg = regiments[loop.index0] %}
+        <div class="row">
+            <h2>{{ instrument.label }}</h2>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h4>Warmups</h4>
+                <p>{{ reg.warmups }}</p>
+            </div>
+            <div class="col">
+                <h4>Repertoire</h4>
+                <p>{{ reg.repertoire }}</p>
+            </div>
+            <div class="col">
+                <h3>{{ reg.goalInMinutes//60 }}h{{ reg.goalInMinutes%60 }}m</h3>
+            </div>
+            <div class="col">
+                <a href="/calendar/{{ date }}/{{ instrument.label }}">Edit</a>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

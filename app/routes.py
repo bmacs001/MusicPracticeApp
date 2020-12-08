@@ -1,16 +1,15 @@
-from datetime import date
-
-from flask import render_template, redirect, flash, request, url_for
-from flask_wtf import FlaskForm
-from werkzeug.urls import url_parse
-from wtforms import SubmitField
-from wtforms.fields.html5 import DateField, IntegerField
-from wtforms.validators import DataRequired
+from time import strftime
 
 from app import app, db
 from app.models import User, Instrument, Regiment
-from flask_login import current_user, login_user, logout_user, login_required
 from app.forms import LoginForm, RegimentForm, RegistrationForm, InstrumentForm
+from datetime import date
+from flask import render_template, redirect, flash, request, url_for
+from flask_wtf import FlaskForm
+from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.urls import url_parse
+from wtforms import SubmitField
+from wtforms.fields.html5 import DateField, IntegerField
 
 
 @app.route('/')
@@ -66,7 +65,7 @@ def setInstruments():
     form = InstrumentForm()
     output = ""
     for instrumentOut in current_user.instruments:
-        output+=str(instrumentOut.label)+"\r\n"
+        output += str(instrumentOut.label) + "\r\n"
     form.instruments.data = output
     if form.validate_on_submit():
         instrumentsIn = str(form.instruments.data).split("\r\n")
@@ -87,6 +86,7 @@ def setInstruments():
 def defaultGoals():
     class FormClass(FlaskForm):
         submit = SubmitField('Submit')
+
     for instrument in current_user.instruments:
         setattr(FormClass, instrument.label + "TimeHour", IntegerField())
         setattr(FormClass, instrument.label + "TimeMin", IntegerField())
@@ -94,15 +94,16 @@ def defaultGoals():
     if form.validate_on_submit():
         for instrument in current_user.instruments:
             min = 0
-            if getattr(form, instrument.label+"TimeHour").data is not None:
-                min+=getattr(form, instrument.label+"TimeHour").data*60
-            if getattr(form, instrument.label+"TimeMin").data is not None:
-                min+=getattr(form, instrument.label+"TimeMin").data
+            if getattr(form, instrument.label + "TimeHour").data is not None:
+                min += getattr(form, instrument.label + "TimeHour").data * 60
+            if getattr(form, instrument.label + "TimeMin").data is not None:
+                min += getattr(form, instrument.label + "TimeMin").data
             instrument.defaultGoalInMinutes = min
         db.session.commit()
         flash("Default practice times for each instrument have been recorded. Review your changes in your Account page")
         return redirect('/index')
-    return render_template('defaultGoals.html', title='Set Default Goals', form=form, instruments=current_user.instruments)
+    return render_template('defaultGoals.html', title='Set Default Goals', form=form,
+                           instruments=current_user.instruments)
 
 
 @app.route('/practice')
@@ -122,7 +123,7 @@ def practice(instrument):
         regimentIn = Regiment(
             date=today,
             goalInMinutes=instrumentIn.defaultGoalInMinutes,
-            instrumentId = instrumentIn.id,
+            instrumentId=instrumentIn.id,
             timeElapsedInSeconds=0
         )
         db.session.add(regimentIn)
@@ -137,69 +138,68 @@ def account():
     return render_template('account.html')
 
 
-@app.route('/calendar')
+@app.route('/calendar', methods=['GET', 'POST'])
 @login_required
 def calendar():
     class FormClass(FlaskForm):
-        dayIn = DateField('Select Date', validators=[DataRequired()])
+        dayIn = DateField('Select Date')
+
     setattr(FormClass, "submit", SubmitField('Select'))
     form = FormClass()
     if form.validate_on_submit():
-        return redirect('/calendar/' + form.dayIn.data)
+        return redirect('/calendar/' + str(form.dayIn.data))
     return render_template('calendar.html', form=form)
 
 
-@app.route('/calendar/<date>')
+@app.route('/calendar/<dateStr>')
 @login_required
-def calendarOnDate(date):
-    return render_template('calendarBydate.html', date=date)
+def calendarOnDate(dateStr):
+    dateIn = date.fromisoformat(dateStr)
+    regiments = []
+    for instrument in current_user.instruments:
+        regimentIn = next((i for i in instrument.regiments if i.date == dateIn), None)
+        if regimentIn is None:
+            regimentIn = Regiment(
+                date=date,
+                goalInMinutes=instrument.defaultGoalInMinutes
+            )
+        regiments.append(regimentIn)
+    return render_template('calendarBydate.html', date=dateIn, dateFormatted=dateIn.strftime('%A, %B %d, %Y'),
+                           regiments=regiments)
 
 
-@app.route('/calendar/<date>/<instrument>')
+@app.route('/calendar/<dateStr>/<instrument>', methods=['GET', 'POST'])
 @login_required
-def viewRegiment(date, instrument):
-    instrumentIn = next((i for i in current_user.instruments if i.label == instrument), None)
-    regimentIn = next((i for i in instrumentIn.regiments if i.date == date), None)
-    if regimentIn is None:
-        regimentIn = Regiment(
-            date=date,
-            goalInMinutes=instrumentIn.defaultGoalInMinutes
-        )
-    return render_template('viewRegiment.html', instrumentIn=instrumentIn, regimentIn=regimentIn, date=date)
-
-
-@app.route('/calendar/<date>/<instrument>/edit')
-@login_required
-def editRegiment(date, instrument):
+def editRegiment(dateStr, instrument):
+    dateIn = date.fromisoformat(dateStr)
     instrumentIn = next((i for i in current_user.instruments if i.label == instrument), None)
     regimentIn = next((i for i in instrumentIn.regiments if i.date == date), None)
     form = RegimentForm()
     if regimentIn is None:
-        form.goalMin.data=instrumentIn.defaultGoalInMinutes%60
-        form.goalHour.data=instrumentIn.defaultGoalInMinutes/60
+        min = instrumentIn.defaultGoalInMinutes % 60
+        hour = instrumentIn.defaultGoalInMinutes // 60
     else:
-        form.goalMin.data=regimentIn.goalInMinutes%60
-        form.goalHour.data = regimentIn.goalInMinutes/60
-        form.warmups.data = regimentIn.warmpus
-        form.repertoire.data = regimentIn.repertoire
+        min = regimentIn.goalInMinutes % 60
+        hour = regimentIn.goalInMinutes // 60
     if form.validate_on_submit():
         if regimentIn is None:
             regimentIn = Regiment(
-                date=date,
+                date=dateIn,
                 instrumentId=instrumentIn.id,
                 warmups=form.warmups.data,
                 repertoire=form.repertoire.data,
-                goalInMinutes=form.goalMin.data+form.goalHour.data*60,
+                goalInMinutes=form.goalMin.data + form.goalHour.data * 60,
                 timeElapsedInSeconds=0
             )
             db.session.add(regimentIn)
         else:
-            regimentIn.warmups=form.warmups.data
-            regimentIn.repertoire=form.repertoire.data
-            regimentIn.goalInMinutes=form.goalMin.data+form.goalHour.data*60
+            regimentIn.warmups = form.warmups.data
+            regimentIn.repertoire = form.repertoire.data
+            regimentIn.goalInMinutes = form.goalMin.data + form.goalHour.data * 60
         db.session.commit()
-        return redirect('/calendar/' + date + '/' + instrument)
-    return render_template('editRegiment.html', form=form)
+        return redirect('/calendar/' + dateStr)
+    return render_template('editRegiment.html', form=form, instrument=instrumentIn, regiment=regimentIn, min=min,
+                           hour=hour, dateFormatted=dateIn.strftime('%A, %B %d, %Y'))
 
 
 @app.errorhandler(404)
