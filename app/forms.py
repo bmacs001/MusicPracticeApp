@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import \
-    StringField, SubmitField, PasswordField, BooleanField, TextAreaField, FieldList, FormField
+    StringField, SubmitField, PasswordField, BooleanField, TextAreaField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
@@ -13,19 +13,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
-class InstrumentForm(FlaskForm):
-    label = StringField('Input Instruments To Practice (Separate with line breaks)')
-    defaultGoalHour = IntegerField('Default Goal')
-    defaultGoalMin = IntegerField('Default Goal')
-
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    instruments = FieldList(FormField(InstrumentForm()))
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -37,6 +30,11 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+
+class InstrumentForm(FlaskForm):
+    instruments = TextAreaField('Input Instruments To Practice (Separate with line breaks)')
+    submit = SubmitField('Submit')
 
 
 class RegimentForm(FlaskForm):

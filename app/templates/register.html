@@ -3,7 +3,7 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <div class="row justify-content-center">
+     <div class="row justify-content-center">
          <p>
              {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
@@ -11,7 +11,7 @@
                 <span style="color: #ff0000;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        </div>
+     </div>
         <div class="row justify-content-center">
         <p>
             {{ form.email.label }}<br>
@@ -22,64 +22,23 @@
         </p>
         </div>
         <div class="row justify-content-center">
-            <p>
-                {{ form.password.label }}<br>
-                {{ form.password(size=32) }}<br>
-                {% for error in form.password.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.password2.label }}<br>
-                {{ form.password2(size=32) }}<br>
-                {% for error in form.password2.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}<br>
+            {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password2.label }}<br>
+            {{ form.password2(size=32) }}<br>
+            {% for error in form.password2.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         </div>
-        <div class="container">
-            <div class="row row-cols-3" id="instruments">
-                <div class="col">Instrument Name</div>
-                <div class="col">Default Goal (HH:MM)</div>
-                <div class="w-100"></div>
-            </div>
-        </div>
-        <script>
-            function addInstrument() {
-                var instruments = document.getElementById("instruments")
-                {% set newInstrument = InstrumentForm(
-                        label= "",
-                        defaultGoalHour= 0,
-                        defaultGoalMin= 0
-                    )
-                %}
-                {% form.instruments.append_entry(newInstrument) %}
-                var labelCol = document.createElement("DIV")
-                labelCol.className="col"
-                labelCol.appendChild({{ newInstrument.label() }})
-                instruments.appendChild(labelCol)
-                var timeCol = document.createElement("DIV")
-                timeCol.className="col"
-                timeCol.appendChild({{ newInstrument.defaultGoalHour(min="0", max="23") }})
-                timeCol.append(":")
-                timeCol.appendChild({{ newInstrument.defaultGoalMin(min="0", max="59") }})
-                instruments.appendChild(timeCol)
-                var removeCol = document.createElement("DIV")
-                removeCol.className="col"
-                var deleteButton = document.createElement("button")
-                deleteButton.addEventListener("click", function() {
-                    {% form.instruments.remove(newInstrument) %}
-                    document.removeChild(labelCol)
-                    document.removeChild(timeCol)
-                    document.removeChild(removeCol)
-                })
-                removeCol.appendChild(deleteButton)
-                instruments.appendChild(removeCol)
-            }
-        </script>
-        <button type="button" onclick="addInstrument()">Add Instrument</button>
         <div class="row justify-content-center">
-            <p>{{ form.submit() }}</p>
+        <p>{{ form.submit() }}</p>
         </div>
     </form>
 {% endblock %}

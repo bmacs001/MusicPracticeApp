@@ -1,37 +1,37 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 {% block content %}
-    <script>
-        function addInstrument() {
-            var instruments = document.getElementById("instruments")
-            {% set newInstrument = InstrumentForm(
-                    label= "",
-                    defaultGoalHour= 0,
-                    defaultGoalMin= 0
-                )
-            %}
-            {% form.instruments.append_entry(newInstrument) %}
-            var labelCol = document.createElement("DIV")
-            labelCol.className="col"
-            labelCol.appendChild({{ newInstrument.label() }})
-            instruments.appendChild(labelCol)
-            var timeCol = document.createElement("DIV")
-            timeCol.className="col"
-            timeCol.appendChild({{ newInstrument.defaultGoalHour(min="0", max="23") }})
-            timeCol.append(":")
-            timeCol.appendChild({{ newInstrument.defaultGoalMin(min="0", max="59") }})
-            instruments.appendChild(timeCol)
-            var removeCol = document.createElement("DIV")
-            removeCol.className="col"
-            var deleteButton = document.createElement("button")
-            deleteButton.addEventListener("click", function() {
-                {% form.instruments.remove(newInstrument) %}
-                document.removeChild(labelCol)
-                document.removeChild(timeCol)
-                document.removeChild(removeCol)
-            })
-            removeCol.appendChild(deleteButton)
-            instruments.appendChild(removeCol)
-        }
+    <div class="container-fluid">
+    <div class="row flex-xl-nowrap">
+        <div class="col-md-3 col-xl-2 bd-sidebar">
+            <h1>{{ current_user.username }}</h1>
+        </div>
+        <div class="col">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h3 style="display:inline;">Instruments</h3>
+                        <p><a href="/setInstruments">Edit</a></p>
+                    </div>
+                    <div class="col">
+                        <h4 style="display:inline;">Goals</h4>
+                        <p><a href="/defaultGoals">Edit</a></p>
+                    </div>
+                </div>
+                {% for instrument in current_user.instruments %}
+                    <div class="row">
+                        <div class="col">
+                            {{ instrument.label }}
+                        </div>
+                        <div class="col">
+                            {{ instrument.defaultGoalInMinutes//60 }}:{{ instrument.defaultGoalInMinutes%60 }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
         function removeInst() {
             {% form.instruments.remove(newInstrument) %}
             document.removeChild(document.getElementById("instTime{{ loop.index0 }}"))
