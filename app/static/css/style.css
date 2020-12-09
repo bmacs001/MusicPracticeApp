@@ -9,10 +9,20 @@ Write two "@import" statements below to add the "Roboto" and "Hepta Slab" fonts 
 @import url('https://fonts.googleapis.com/css?family=Hepta+Slab&display=swap');
 
 .text-dkblue{
-    color:yellow;
+    font-family: 'signika', sans-serif;
+    color:mediumpurple;
 }
 
 .bg-blue{
     background-color: #78C3FB
+}
+
+.text {
+  font-family: 'signika', sans-serif;
+}
+
+@font-face {
+  font-family: signika;
+  src: url(../signika/Signika-VariableFont_wght.ttf)
 }
 
