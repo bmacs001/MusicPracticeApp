@@ -9,6 +9,10 @@ Write two "@import" statements below to add the "Roboto" and "Hepta Slab" fonts 
 @import url('https://fonts.googleapis.com/css?family=Hepta+Slab&display=swap');
 
 .text-dkblue{
-    color:#262c3a
+    color:yellow;
+}
+
+.bg-blue{
+    background-color: #78C3FB
 }
 
