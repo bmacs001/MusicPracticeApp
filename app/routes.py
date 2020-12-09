@@ -52,6 +52,13 @@ def register():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
+        db.session.commit
+        for instrumentIn in form.instruments:
+            db.session.add(Instrument(
+                label=instrumentIn.label.data,
+                userId=user.id,
+                defaultGoalInMinutes=int(instrumentIn.defaultGoalHour.data)*60+int(instrumentIn.defaultGoalMin.data)
+            ))
         db.session.commit()
 
         flash('New user registered.')
@@ -141,9 +148,16 @@ def recordPractice():
         request.form['second'] + request.form['minute']*60 + request.form['hour']*3600
 
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    form = RegistrationForm()
+    for instrument in current_user.instruments:
+        RegistrationForm.instruments.append_entry(InstrumentForm(
+            label = instrument.label,
+            defaultGoalHour = instrument.defaultGoalInMinutes//60,
+            defaultGoalMin = instrument.defaultGoalInMinutes%60
+        ))
     return render_template('account.html')
 
 
