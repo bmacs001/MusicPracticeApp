@@ -1,5 +1,44 @@
  {% extends "base.html" %}
 {% block content %}
+    <script>
+        function addInstrument() {
+            var instruments = document.getElementById("instruments")
+            {% set newInstrument = InstrumentForm(
+                    label= "",
+                    defaultGoalHour= 0,
+                    defaultGoalMin= 0
+                )
+            %}
+            {% form.instruments.append_entry(newInstrument) %}
+            var labelCol = document.createElement("DIV")
+            labelCol.className="col"
+            labelCol.appendChild({{ newInstrument.label() }})
+            instruments.appendChild(labelCol)
+            var timeCol = document.createElement("DIV")
+            timeCol.className="col"
+            timeCol.appendChild({{ newInstrument.defaultGoalHour(min="0", max="23") }})
+            timeCol.append(":")
+            timeCol.appendChild({{ newInstrument.defaultGoalMin(min="0", max="59") }})
+            instruments.appendChild(timeCol)
+            var removeCol = document.createElement("DIV")
+            removeCol.className="col"
+            var deleteButton = document.createElement("button")
+            deleteButton.addEventListener("click", function() {
+                {% form.instruments.remove(newInstrument) %}
+                document.removeChild(labelCol)
+                document.removeChild(timeCol)
+                document.removeChild(removeCol)
+            })
+            removeCol.appendChild(deleteButton)
+            instruments.appendChild(removeCol)
+        }
+        function removeInst() {
+            {% form.instruments.remove(newInstrument) %}
+            document.removeChild(document.getElementById("instTime{{ loop.index0 }}"))
+            document.removeChild(document.getElementById("instLabel{{ loop.index0 }}"))
+            document.removeChild(document.getElementById("instRemove{{ loop.index0 }}"))
+        }
+    </script>
     <div class="container-fluid">
     <div class="row flex-xl-nowrap">
         <div class="col-md-3 col-xl-2 bd-sidebar">
@@ -11,42 +50,22 @@
                     <div class="col">Instrument Name</div>
                     <div class="col">Default Goal (HH:MM)</div>
                     <div class="w-100"></div>
-
+                    {% for instrument in form.instruments %}
+                        <div class="col" id="instLabel{{ loop.index0 }}">
+                            {{ instrument.label(value=current_user.instruments[loop.index0].label) }}
+                        </div>
+                        <div class="col" id="instTime{{ loop.index0 }}">
+                            {{ instrument.defaultGoalHour(value=current_user.instruments[loop.index0].defaultGoalInMinutes//60) }}
+                            {{ instrument.defaultGoalMin(value=current_user.instruments[loop.index0].defaultGoalInMinutes%60) }}
+                        </div>
+                        <div class="col">
+                            <button type="button" id= id="instRemove{{ loop.index0 }}" onclick="removeInst()">
+                                Remove
+                            </button>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            <script>
-                function addInstrument() {
-                    var instruments = document.getElementById("instruments")
-                    {% set newInstrument = InstrumentForm(
-                            label= "",
-                            defaultGoalHour= 0,
-                            defaultGoalMin= 0
-                        )
-                    %}
-                    {% form.instruments.append_entry(newInstrument) %}
-                    var labelCol = document.createElement("DIV")
-                    labelCol.className="col"
-                    labelCol.appendChild({{ newInstrument.label() }})
-                    instruments.appendChild(labelCol)
-                    var timeCol = document.createElement("DIV")
-                    timeCol.className="col"
-                    timeCol.appendChild({{ newInstrument.defaultGoalHour(min="0", max="23") }})
-                    timeCol.append(":")
-                    timeCol.appendChild({{ newInstrument.defaultGoalMin(min="0", max="59") }})
-                    instruments.appendChild(timeCol)
-                    var removeCol = document.createElement("DIV")
-                    removeCol.className="col"
-                    var deleteButton = document.createElement("button")
-                    deleteButton.addEventListener("click", function() {
-                        {% form.instruments.remove(newInstrument) %}
-                        document.removeChild(labelCol)
-                        document.removeChild(timeCol)
-                        document.removeChild(removeCol)
-                    })
-                    removeCol.appendChild(deleteButton)
-                    instruments.appendChild(removeCol)
-                }
-            </script>
             <button type="button" onclick="addInstrument()">Add Instrument</button>
         </div>
     </div>

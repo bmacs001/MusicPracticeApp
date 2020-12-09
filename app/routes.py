@@ -57,60 +57,13 @@ def register():
             db.session.add(Instrument(
                 label=instrumentIn.label.data,
                 userId=user.id,
-                defaultGoalInMinutes=int(instrumentIn.defaultGoalHour.data)*60+int(instrumentIn.defaultGoalMin.data)
+                defaultGoalInMinutes=int(instrumentIn.defaultGoalHour.data) * 60 + int(instrumentIn.defaultGoalMin.data)
             ))
         db.session.commit()
 
         flash('New user registered.')
         return redirect(url_for('setInstruments'))
     return render_template('register.html', title='Register', form=form)
-
-
-@app.route('/setInstruments', methods=['GET', 'POST'])
-@login_required
-def setInstruments():
-    form = InstrumentForm()
-    output = ""
-    for instrumentOut in current_user.instruments:
-        output += str(instrumentOut.label) + "\r\n"
-    form.instruments.data = output
-    if form.validate_on_submit():
-        instrumentsIn = str(form.instruments.data).split("\r\n")
-        for instrumentIn in instrumentsIn:
-            if next((i for i in current_user.instruments if i.label == instrumentIn), None) is None \
-                    and instrumentIn != '':
-                db.session.add(Instrument(
-                    label=instrumentIn,
-                    userId=current_user.id
-                ))
-        db.session.commit()
-        return redirect(url_for('defaultGoals'))
-    return render_template('setInstruments.html', title='Set Instruments', form=form)
-
-
-@app.route('/defaultGoals', methods=['GET', 'POST'])
-@login_required
-def defaultGoals():
-    class FormClass(FlaskForm):
-        submit = SubmitField('Submit')
-
-    for instrument in current_user.instruments:
-        setattr(FormClass, instrument.label + "TimeHour", IntegerField())
-        setattr(FormClass, instrument.label + "TimeMin", IntegerField())
-    form = FormClass()
-    if form.validate_on_submit():
-        for instrument in current_user.instruments:
-            min = 0
-            if getattr(form, instrument.label + "TimeHour").data is not None:
-                min += getattr(form, instrument.label + "TimeHour").data * 60
-            if getattr(form, instrument.label + "TimeMin").data is not None:
-                min += getattr(form, instrument.label + "TimeMin").data
-            instrument.defaultGoalInMinutes = min
-        db.session.commit()
-        flash("Default practice times for each instrument have been recorded. Review your changes in your Account page")
-        return redirect('/index')
-    return render_template('defaultGoals.html', title='Set Default Goals', form=form,
-                           instruments=current_user.instruments)
 
 
 @app.route('/practice')
@@ -137,15 +90,15 @@ def practice(instrument):
         db.session.add(regimentIn)
         db.session.commit()
     return render_template('practice.html', title='Practice', instruments=current_user.instruments, today=today,
-                           instrumentIn=instrumentIn, regimentIn=regimentIn, hour=regimentIn.goalInMinutes//60,
-                           min=regimentIn.goalInMinutes%60)
+                           instrumentIn=instrumentIn, regimentIn=regimentIn, hour=regimentIn.goalInMinutes // 60,
+                           min=regimentIn.goalInMinutes % 60)
 
 
 @app.route('/practicedToday', methods=['POST'])
 @login_required
 def recordPractice():
     Regiment.query().filter_by(id=request.form['regimentId']).first().timeElapsedInSeconds = \
-        request.form['second'] + request.form['minute']*60 + request.form['hour']*3600
+        request.form['second'] + request.form['minute'] * 60 + request.form['hour'] * 3600
 
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -153,11 +106,9 @@ def recordPractice():
 def account():
     form = RegistrationForm()
     for instrument in current_user.instruments:
-        RegistrationForm.instruments.append_entry(InstrumentForm(
-            label = instrument.label,
-            defaultGoalHour = instrument.defaultGoalInMinutes//60,
-            defaultGoalMin = instrument.defaultGoalInMinutes%60
-        ))
+        RegistrationForm.instruments.append_entry(InstrumentForm())
+    if form.validate_on_submit():
+        return redirect('/account')
     return render_template('account.html')
 
 
