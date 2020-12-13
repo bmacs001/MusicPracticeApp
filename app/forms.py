@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import \
     StringField, SubmitField, PasswordField, BooleanField, TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange
 from app.models import User
 
 
@@ -33,13 +33,13 @@ class RegistrationForm(FlaskForm):
 
 
 class InstrumentForm(FlaskForm):
-    instruments = TextAreaField('Input Instruments To Practice (Separate with line breaks)')
+    instruments = StringField('Input New Instrument')
     submit = SubmitField('Submit')
+    goalMin = IntegerField('Custom Goal', validators=[DataRequired(), NumberRange(min=0, max=59, message="Invalid input in 'Minutes'")])
+    goalHour = IntegerField('Custom Goal')
 
 
 class RegimentForm(FlaskForm):
     warmups = TextAreaField('Warmup')
     repertoire = TextAreaField('Repertoire')
-    goalMin = IntegerField('Custom Goal')
-    goalHour = IntegerField('Custom Goal')
     submit = SubmitField('Submit')

@@ -22,7 +22,7 @@ class User(UserMixin, db.Model):
 
 class Instrument(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    label = db.Column(db.String(64), index=True, unique=True)
+    label = db.Column(db.String(64), index=True)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     defaultGoalInMinutes = db.Column(db.Integer)
     regiments = db.relationship('Regiment', backref='venue', lazy='dynamic')

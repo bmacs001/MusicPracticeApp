@@ -3,8 +3,20 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <h1>{{ form.instruments.label }}</h1>
-        <p>{{ form.instruments(size=32) }}<br></p>
-        <p>{{ form.submit() }}</p>
+        <h1 style="padding-left: 15px; padding-top: 10px" class="text text-color">Add a new Instrument</h1>
+        <div style="padding-left: 15px; display: flex;">
+            <div style="padding-right: 20px">
+                <p class="text">Instrument Name</p>
+                <p class="text">{{ form.instruments(size=32) }}<br></p>
+            </div>
+            <div>
+                <p class="text">Practice Goal</p>
+                <div style="display: flex" class="text">
+                    <p style="padding-right:10px">Hours: {{ form.goalHour() }}</p>
+                    <p >Minutes: {{ form.goalMin() }}</p>
+                </div>
+            </div>
+        </div>
+    <p style="padding-left: 15px">{{ form.submit() }}</p>
     </form>
 {% endblock %}

@@ -63,21 +63,14 @@ def register():
 @login_required
 def setInstruments():
     form = InstrumentForm()
-    output = ""
-    for instrumentOut in current_user.instruments:
-        output += str(instrumentOut.label) + "\r\n"
-    form.instruments.data = output
     if form.validate_on_submit():
-        instrumentsIn = str(form.instruments.data).split("\r\n")
-        for instrumentIn in instrumentsIn:
-            if next((i for i in current_user.instruments if i.label == instrumentIn), None) is None \
-                    and instrumentIn != '':
-                db.session.add(Instrument(
-                    label=instrumentIn,
-                    userId=current_user.id
-                ))
+        db.session.add(Instrument(
+            label=form.instruments.data,
+            userId=current_user.id,
+            defaultGoalInMinutes=form.goalMin.data + (form.goalHour.data * 60)
+        ))
         db.session.commit()
-        return redirect(url_for('defaultGoals'))
+        return redirect(url_for('account'))
     return render_template('setInstruments.html', title='Set Instruments', form=form)
 
 
