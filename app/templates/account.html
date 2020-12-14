@@ -1,29 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container-fluid">
-    <div class="row flex-xl-nowrap">
-        <div class="col-md-3 col-xl-2 bd-sidebar">
-            <h1>{{ current_user.username }}</h1>
+    <div class="container-fluid" style="padding-top: 0px; height: 100%;">
+    <div class="row flex-xl-nowrap text" style="height: 100%">
+        <div class="col-md-3 col-xl-2 bd-sidebar" style="border-right-color: black;
+            border-right-width: 1px; border-right-style: solid; height: 100%">
+            <img src="../static/defualtpp.png" style="width:85%;">
+            <h1 style="padding-top: 10px; color: mediumpurple">{{ current_user.username }}</h1>
+            <h3 style="color: mediumpurple; cursor: pointer" onclick="setWindowInstruments()" id="insBtn">Instruments</h3>
+            <h3 style="color: gray; cursor: pointer" onclick="" id="profBtn">Profile</h3>
+            <h3 style="color: gray; cursor: pointer" onclick="" id="setBtn">Settings</h3>
+            <h3 style="color: gray; cursor: pointer" onclick="" id="othBtn">Other</h3>
+
         </div>
-        <div class="col">
-            <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <h3 style="display:inline;">Instruments</h3>
-                        <p><a href="/setInstruments">Edit</a></p>
-                    </div>
-                    <div class="col">
-                        <h4 style="display:inline;">Goals</h4>
-                        <p><a href="/defaultGoals">Edit</a></p>
-                    </div>
+        <div class="col"  style="width: 100%; min-width: 100%;">
+            <div class="container" style="width: 100%; min-width: 100%;">
+                <div class="row" style="border-bottom-style: solid; border-bottom-width: 1px; width: 100%;
+                    display: flex; justify-content: space-between">
+                    <h1 class="text-color">Instruments</h1>
+                    <a href="setInstruments" style="color: #147efb; align-self: center; margin-right: 500px; font-size: 20px">Add</a>
                 </div>
                 {% for instrument in current_user.instruments %}
-                    <div class="row">
-                        <div class="col">
+                    <div class="row" style="border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: gray">
+                        <div class="col" style="font-size: 30px">
                             {{ instrument.label }}
                         </div>
-                        <div class="col">
-                            {{ instrument.defaultGoalInMinutes//60 }}:{{ instrument.defaultGoalInMinutes%60 }}
+                        <div class="col" style="font-size: 25px">
+                            {% if instrument.defaultGoalInMinutes%60 > 9 %}
+                                Goal: {{ instrument.defaultGoalInMinutes//60 }}:{{ instrument.defaultGoalInMinutes%60 }}
+                            {% else %}
+                                Goal: {{ instrument.defaultGoalInMinutes//60 }}:0{{ instrument.defaultGoalInMinutes%60 }}
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -31,42 +37,20 @@
         </div>
     </div>
     </div>
-{% endblock %}
-        function removeInst() {
-            {% form.instruments.remove(newInstrument) %}
-            document.removeChild(document.getElementById("instTime{{ loop.index0 }}"))
-            document.removeChild(document.getElementById("instLabel{{ loop.index0 }}"))
-            document.removeChild(document.getElementById("instRemove{{ loop.index0 }}"))
+    <script>
+        let window = "instruments";
+        function setWindowInstruments(){
+             window = "instruments";
+             document.getElementById("insBtn").style.backgroundColor = "mediumpurple"
+        }
+        function setWindowProfile(){
+            window = "profile";
+        }
+        function setWindowSettings(){
+            window = "settings";
+        }
+        function setWindowOther(){
+            window = "other";
         }
     </script>
-    <div class="container-fluid">
-    <div class="row flex-xl-nowrap">
-        <div class="col-md-3 col-xl-2 bd-sidebar">
-            <h1>{{ current_user.username }}</h1>
-        </div>
-        <div class="col">
-            <div class="container">
-                <div class="row row-cols-3" id="instruments">
-                    <div class="col">Instrument Name</div>
-                    <div class="col">Default Goal (HH:MM)</div>
-                    <div class="w-100"></div>
-                    {% for instrument in form.instruments %}
-                        <div class="col" id="instLabel{{ loop.index0 }}">
-                            {{ instrument.label(value=current_user.instruments[loop.index0].label) }}
-                        </div>
-                        <div class="col" id="instTime{{ loop.index0 }}">
-                            {{ instrument.defaultGoalHour(value=current_user.instruments[loop.index0].defaultGoalInMinutes//60) }}
-                            {{ instrument.defaultGoalMin(value=current_user.instruments[loop.index0].defaultGoalInMinutes%60) }}
-                        </div>
-                        <div class="col">
-                            <button type="button" id= id="instRemove{{ loop.index0 }}" onclick="removeInst()">
-                                Remove
-                            </button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <button type="button" onclick="addInstrument()">Add Instrument</button>
-        </div>
-    </div>
 {% endblock %}

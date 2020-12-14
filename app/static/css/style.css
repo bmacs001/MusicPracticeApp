@@ -21,6 +21,10 @@ Write two "@import" statements below to add the "Roboto" and "Hepta Slab" fonts 
   font-family: 'signika', sans-serif;
 }
 
+.text-color{
+    color:mediumpurple;
+}
+
 @font-face {
   font-family: signika;
   src: url(../signika/Signika-VariableFont_wght.ttf)
@@ -48,3 +52,7 @@ Write two "@import" statements below to add the "Roboto" and "Hepta Slab" fonts 
   padding: 2px 16px;
 }
 
+html, body{
+    height: 100%;
+    min-height: 100%;
+}
