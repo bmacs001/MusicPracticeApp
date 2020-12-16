@@ -51,6 +51,10 @@ Write two "@import" statements below to add the "Roboto" and "Hepta Slab" fonts 
 .container {
   padding: 2px 16px;
 }
+.shad-text {
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
 
 html, body{
     height: 100%;
@@ -64,4 +68,28 @@ html, body{
     justify-content: center;
     justify-items: center;
     justify-self: center;
+}
+.shad-box{
+  box-shadow: 10px 10px 5px grey;
+}
+#stopwatch {
+  background: #eee;
+  border: 1px solid #999;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 250px;
+}
+#sw-time {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+}
+#sw-rst, #sw-go {
+  width: 45%;
+  box-sizing: padding-box;
+  padding: 10px;
+  display: inline-block;
+  background: #aa2f2f;
+  border: 0;
+  color: #fff;
 }
