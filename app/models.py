@@ -34,7 +34,7 @@ class Regiment(db.Model):
     warmups = db.Column(db.Text)
     repertoire = db.Column(db.Text)
     goalInMinutes = db.Column(db.Integer)
-    timeElapsedInSeconds = db.Column(db.Integer)
+    timeLeftInSeconds = db.Column(db.Integer)
     instrumentId = db.Column(db.Integer, db.ForeignKey('instrument.id'))
 
 

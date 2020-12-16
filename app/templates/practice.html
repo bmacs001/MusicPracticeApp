@@ -1,88 +1,119 @@
 {% extends "base.html" %}
 {% block content %}
-<script>
-$(document).ready(function(){
-	var timer = {
-	    hours : {{ hour }},
-		minutes : {{ min }},
-		seconds :  0,
-		isOn : false,
-		blink: false
-	};
+    {% set currReg = regiments[0] %}
+    <script>
+        var sw = {
+            /* [INIT] */
+            etime : null, // holds HTML time display
+            erst : null, // holds HTML reset button
+            ego : null, // holds HTML start/stop button
+            timer : null, // timer object
+            now : {{ currReg.timeLeftInSeconds }}, // current timer
+            init : function () {
+                // Get HTML elements
+                sw.etime = $("sw-time");
+                sw.erst = $("sw-rst");
+                sw.ego = $("sw-go");
 
-	var t; // timespan val from javascript
-	var startStopButton = $("#start-stop");
-	startStopButton.click(
-		function() {
-			startCount();
-		}
-	);
-	$("#reset").click(onReset);
+                // Attach listeners
+                sw.erst.addEventListener("click", sw.reset);
+                sw.erst.disabled = false;
+                sw.ego.addEventListener("click", sw.start);
+                sw.ego.disabled = false;
+                sw.reset()
+            },
 
-	function printTimer() {
-		var min = timer.minutes < 10 ? "0" : "";
-		var sec = + timer.seconds < 10 ? "0" : "";
-		var hour = timer.hours > 0 ? timer.hours + ":" : "";
-		if (timer.hitMax() && timer.blink) {
-				$("#timer-text").text("You've met your goal!");
-		}
-		else {
-			$("#timer-text").text(hour+min
-				+ timer.minutes
-				+ ":"
-				+ sec
-				+ timer.seconds);
-		}
-		timer.blink = !timer.blink;
-	}
+            /* [ACTIONS] */
+            tick : function () {
+            // tick() : update display if stopwatch running
 
-	function startCount() {
-		if (!timer.isOn) {
-			timer.isOn = true;
-			t = setInterval(
-			function () {
-				if (timer.seconds == 0) {
-					timer.minutes --;
-					if (timer.minutes == 0) {
-					    timer.hours --;
-                    }
-					timer.seconds = 60;
-				}
-				timer.seconds --;
-				printTimer();
-            }, 1000);
+                // Calculate hours, mins, seconds
+                sw.now--;
+                var remain = sw.now;
+                var hours = Math.floor(remain / 3600);
+                remain -= hours * 3600;
+                var mins = Math.floor(remain / 60);
+                remain -= mins * 60;
+                var secs = remain;
 
-			startStopButton.text("Pause");
-			startStopButton.click(stopCount);
-			startStopButton.removeClass("btn-success");
-			startStopButton.addClass("btn-danger");
-		}
-	}
+                // Update the display timer
+                if (hours<10) { hours = "0" + hours; }
+                if (mins<10) { mins = "0" + mins; }
+                if (secs<10) { secs = "0" + secs; }
+                sw.etime.innerHTML = hours + ":" + mins + ":" + secs;
+            },
 
-	function stopCount() {
-		clearInterval(t);
-		timer.isOn = false;
-		startStopButton.text("Start");
-		startStopButton.click(startCount);
-		startStopButton.removeClass("btn-danger");
-		startStopButton.addClass("btn-success");
-	}
-	window.onbeforeunload = function(){
-	    $.post('/practicedToday', {
-	        hour: hours,
-            minute: minutes,
-            second: seconds,
-            regimentId: {{ regiment.id }}
-	    });
-    }
-});
-</script>
+            start : function () {
+            // start() : start the stopwatch
 
-    <h1 id="timer-text" class="timer">{{ hour }}:{{ minute }}:00</h1>
-    <p class="lead">
-        <div class="row">
-            <button id="start-stop" class="btn btn-lg btn-success">Start</button>
-            <button id="reset" class="btn btn-lg">Reset</button>
+                sw.timer = setInterval(sw.tick, 1000);
+                sw.ego.value = "Stop";
+                sw.ego.removeEventListener("click", sw.start);
+                sw.ego.addEventListener("click", sw.stop);
+            },
+
+            stop  : function () {
+            // stop() : stop the stopwatch
+
+                clearInterval(sw.timer);
+                sw.timer = null;
+                sw.ego.value = "Start";
+                sw.ego.removeEventListener("click", sw.stop);
+                sw.ego.addEventListener("click", sw.start);
+            },
+
+            reset : function () {
+            // reset() : reset the stopwatch
+
+                // Stop if running
+                if (sw.timer != null) { sw.stop(); }
+
+                // Reset time
+                sw.now = {{ currReg.timeLeftInSeconds }};
+                sw.tick();
+            }
+        };
+
+        function finish(){
+            $.post('/practicedToday', {
+                timeIn: sw.now,
+                regimentId: {{ currReg.id }}
+            });
+        }
+
+        window.addEventListener("load", sw.init);
+        window.onbeforeunload = finish
+    </script>
+    <h1 class="text text-color" style="padding-left: 15px; padding-top: 10px">{{ today }}</h1>
+    <p class="text" style="display: flex; font-size: 25px; justify-self: center; justify-content: center; text-align: center">Select an instrument to practice</p>
+    <div class="container">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Select Instrument
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for instrument in instruments %}
+                <a class="dropdown-item" href="#" id="dropdown-{{ loop.index0 }}">{{ instrument.label }}</a>
+                <script>
+                    $("dropdown-{{ loop.index0 }}").addEventListener("click", function setInstrument(instIn) {
+                        finish()
+                        {% set currReg=regiments[loop.index0] %}
+                        sw.now = {{ currReg.timeLeftInSeconds }}
+                        sw.reset()
+                    })
+                </script>
+            {% endfor %}
         </div>
-    </p>
+    <div id="stopwatch">
+        <!-- [DISPLAY TIMER] -->
+        <div id="sw-time">00:00:00</div>
+        <!-- [RESET BUTTON] -->
+        <input type="button" value="Reset" id="sw-rst" disabled/>
+        <!-- [START/STOP BUTTON] -->
+        <input type="button" value="Start" id="sw-go" disabled/>
+    </div>
+
+
+    </div>
+    </div>
 {% endblock %}

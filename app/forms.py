@@ -35,7 +35,7 @@ class RegistrationForm(FlaskForm):
 class InstrumentForm(FlaskForm):
     instruments = StringField('Input New Instrument')
     submit = SubmitField('Submit')
-    goalMin = IntegerField('Custom Goal', validators=[DataRequired(), NumberRange(min=0, max=59, message="Invalid input in 'Minutes'")])
+    goalMin = IntegerField('Custom Goal')
     goalHour = IntegerField('Custom Goal')
 
 

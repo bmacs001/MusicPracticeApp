@@ -99,37 +99,29 @@ def defaultGoals():
 
 @app.route('/practice')
 @login_required
-def practiceHome():
+def practice():
     today = date.today()
-    return render_template('practiceHome.html', title='Practice', instruments=current_user.instruments,
-                           day=today.strftime('%A, %B %d, %Y'))
-
-
-@app.route('/practice/<instrument>', methods=['GET', 'POST'])
-@login_required
-def practice(instrument):
-    today = date.today()
-    instrumentIn = next((i for i in current_user.instruments if i.label == instrument), None)
-    regimentIn = next((i for i in instrumentIn.regiments if i.date == today), None)
-    if regimentIn is None:
-        regimentIn = Regiment(
-            date=today,
-            goalInMinutes=instrumentIn.defaultGoalInMinutes,
-            instrumentId=instrumentIn.id,
-            timeElapsedInSeconds=0
-        )
-        db.session.add(regimentIn)
-        db.session.commit()
-    return render_template('practice.html', title='Practice', instruments=current_user.instruments, today=today,
-                           instrumentIn=instrumentIn, regimentIn=regimentIn, hour=regimentIn.goalInMinutes//60,
-                           min=regimentIn.goalInMinutes%60)
+    regiments =[]
+    for instrument in current_user.instruments:
+        regimentIn = next((i for i in instrument.regiments if i.date == today), None)
+        if regimentIn is None:
+            regimentIn = Regiment(
+                date=today,
+                goalInMinutes=instrument.defaultGoalInMinutes,
+                instrumentId=instrument.id,
+                timeLeftInSeconds=instrument.defaultGoalInMinutes*60
+            )
+            db.session.add(regimentIn)
+            db.session.commit()
+        regiments.append(regimentIn)
+    return render_template('practice.html', title='Practice', instruments=current_user.instruments,
+                           today=today.strftime('%A, %B %d, %Y'),regiments=regiments)
 
 
 @app.route('/practicedToday', methods=['POST'])
 @login_required
 def recordPractice():
-    Regiment.query().filter_by(id=request.form['regimentId']).first().timeElapsedInSeconds = \
-        request.form['second'] + request.form['minute']*60 + request.form['hour']*3600
+    Regiment.query().filter_by(id=request.form['regimentId']).first().timeLeftInSeconds = request.form['timeIn']
 
 
 @app.route('/account')
@@ -189,7 +181,7 @@ def editRegiment(dateStr, instrument):
                 warmups=form.warmups.data,
                 repertoire=form.repertoire.data,
                 goalInMinutes=form.goalMin.data + form.goalHour.data * 60,
-                timeElapsedInSeconds=0
+                timeLeftInSeconds=(form.goalMin.data + form.goalHour.data * 60)*60
             )
             db.session.add(regimentIn)
         else:
