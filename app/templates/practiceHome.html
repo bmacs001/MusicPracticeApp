@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+    <div style="display: flex; flex-direction: row; justify-content: space-between; padding-right: 20px">
+        <div>
+            <h1 class="text text-color" style="padding-left: 15px; padding-top: 10px">{{ month }} {{ day }}</h1>
+        </div>
+        <div id="stopwatch">
+            <!-- [DISPLAY TIMER] -->
+            <div id="sw-time">00:00:00</div>
+            <!-- [RESET BUTTON] -->
+            <input type="button" value="Reset" id="sw-rst" disabled/>
+            <!-- [START/STOP BUTTON] -->
+            <input type="button" value="Start" id="sw-go" disabled/>
+        </div>
+    </div>
+    <p class="text" style="display: flex; font-size: 25px; justify-self: center; justify-content: center; text-align: center">Select an instrument to practice</p>
+    <div class="container" style="display: flex; font-size: 25px; justify-self: center; justify-content: center; text-align: center">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Select Instrument
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for instrument in instruments %}
+                  <p class="dropdown-item" id="instrument-{{ instrument.label }}">{{ instrument.label }}</p>
+                {% endfor %}
+          </div>
+        </div>
+    </div>
+    <div style="width: 100%;">
+        <a id=start-link href="practice" style="display: block; margin-right: auto; margin-left: auto; width: 18% !important; height: 18vw;">
+            <div id="start-practicing">
+                <h1 class="text">Start</h1>
+            </div>
+        </a>
+    </div>
+
+    <script>
+        let start = document.getElementById("start-link")
+        start.setAttribute(href, )
+
+    </script>
+{% endblock %}

@@ -36,7 +36,7 @@ def login():
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('practice_home')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -99,29 +99,56 @@ def defaultGoals():
 
 @app.route('/practice')
 @login_required
-def practice():
+def practice_home():
     today = date.today()
-    regiments =[]
-    for instrument in current_user.instruments:
-        regimentIn = next((i for i in instrument.regiments if i.date == today), None)
-        if regimentIn is None:
-            regimentIn = Regiment(
-                date=today,
-                goalInMinutes=instrument.defaultGoalInMinutes,
-                instrumentId=instrument.id,
-                timeLeftInSeconds=instrument.defaultGoalInMinutes*60
-            )
-            db.session.add(regimentIn)
-            db.session.commit()
-        regiments.append(regimentIn)
-    return render_template('practice.html', title='Practice', instruments=current_user.instruments,
-                           today=today.strftime('%A, %B %d, %Y'),regiments=regiments)
+    raw_day = today.day
+    months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+              'October', 'November', 'December']
+    if raw_day == 1:
+        day = '1st'
+    elif raw_day == 2:
+        day = '2nd'
+    elif raw_day == 3:
+        day = '3rd'
+    elif raw_day == 21:
+        day = '21st'
+    elif raw_day == 22:
+        day = '22nd'
+    elif raw_day == 23:
+        day = '23rd'
+    elif raw_day == 31:
+        day = '31st'
+    else:
+        day = str(raw_day) + 'th'
+    return render_template('practiceHome.html', title='Practice', instruments=current_user.instruments,
+                           day=day, month=months[today.month])
+
+
+@app.route('/practice/<instrument>', methods=['GET', 'POST'])
+@login_required
+def practice(instrument):
+    today = date.today()
+    instrumentIn = next((i for i in current_user.instruments if i.label == instrument), None)
+    regimentIn = next((i for i in instrumentIn.regiments if i.date == today), None)
+    if regimentIn is None:
+        regimentIn = Regiment(
+            date=today,
+            goalInMinutes=instrumentIn.defaultGoalInMinutes,
+            instrumentId=instrumentIn.id,
+            timeElapsedInSeconds=0
+        )
+        db.session.add(regimentIn)
+        db.session.commit()
+    return render_template('practice.html', title='Practice', instruments=current_user.instruments, today=today,
+                           instrumentIn=instrumentIn, regimentIn=regimentIn, hour=regimentIn.goalInMinutes//60,
+                           min=regimentIn.goalInMinutes%60)
 
 
 @app.route('/practicedToday', methods=['POST'])
 @login_required
 def recordPractice():
-    Regiment.query().filter_by(id=request.form['regimentId']).first().timeLeftInSeconds = request.form['timeIn']
+    Regiment.query().filter_by(id=request.form['regimentId']).first().timeElapsedInSeconds = \
+        request.form['second'] + request.form['minute']*60 + request.form['hour']*3600
 
 
 @app.route('/account')
@@ -181,7 +208,7 @@ def editRegiment(dateStr, instrument):
                 warmups=form.warmups.data,
                 repertoire=form.repertoire.data,
                 goalInMinutes=form.goalMin.data + form.goalHour.data * 60,
-                timeLeftInSeconds=(form.goalMin.data + form.goalHour.data * 60)*60
+                timeElapsedInSeconds=0
             )
             db.session.add(regimentIn)
         else:

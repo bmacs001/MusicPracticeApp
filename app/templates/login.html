@@ -1,34 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
+    <div class="background-splash">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-box card">
 
-        <div class="row justify-content-center">
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}
-        </p>
-        </div>
+                <div class="row justify-content-center" style="margin-top: 10px">
+                    <h1 class="text-mp">Login</h1>
+                </div>
 
-
-        <div class="row justify-content-center">
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}
-        </p>
-        </div>
+                <div class="row justify-content-center" style="margin-top: 10px">
+                <p>
+                    {{ form.username.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.username(size=32, class="form-text-line") }}
+                </p>
+                </div>
 
 
-        <div class="row justify-content-center">
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        </div>
-        <div class="row justify-content-center">
-        <p>{{ form.submit() }}</p>
-        </div>
-        <div class="row justify-content-center">
-            <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
-        </div>
+                <div class="row justify-content-center">
+                <p>
+                    {{ form.password.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.password(size=32, class="form-text-line") }}
+                </p>
+                </div>
 
-    </form>
+
+                <div class="row justify-content-center">
+                <p>{{ form.remember_me() }} {{ form.remember_me.label(class="text") }}</p>
+                </div>
+                <div class="row justify-content-center">
+                <p>{{ form.submit(class="text save-button") }}</p>
+                </div>
+                <div class="row justify-content-center">
+                    <p class="text">New User? <a href="{{ url_for('register') }}">Click to sign up</a></p>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}

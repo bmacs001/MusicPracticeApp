@@ -1,44 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div class="background-splash">
     <form action="" method="post">
         {{ form.hidden_tag() }}
-     <div class="row justify-content-center">
-         <p>
-             {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-                <span style="color: #ff0000;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-     </div>
-        <div class="row justify-content-center">
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=64) }}<br>
-            {% for error in form.email.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+        <div class="form-box card">
+            <div class="row justify-content-center" style="margin-top: 10px">
+                <h1 class="text-mp">Sign Up</h1>
+            </div>
+            <div class="row justify-content-center" style="margin-top: 10px">
+                <p>
+                    {{ form.username.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.username(size=32, class="form-text-line") }}<br>
+                    {% for error in form.username.errors %}
+                        <span style="color: #ff0000;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <p>
+                    {{ form.email.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.email(size=32, class="form-text-line") }}<br>
+                    {% for error in form.email.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <p>
+                    {{ form.password.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.password(size=32, class="form-text-line") }}<br>
+                    {% for error in form.password.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <p>
+                    {{ form.password2.label(class="text", style="font-size: 1.5vw") }}<br>
+                    {{ form.password2(size=32, class="form-text-line") }}<br>
+                    {% for error in form.password2.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <p>{{ form.submit(class="save-button text") }}</p>
+            </div>
         </div>
-        <div class="row justify-content-center">
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        </div>
-        <div class="row justify-content-center">
-        <p>{{ form.submit() }}</p>
         </div>
     </form>
 {% endblock %}
